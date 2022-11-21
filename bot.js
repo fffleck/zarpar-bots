@@ -13,6 +13,7 @@ const bot = async () => {
   const browser = await puppeteer.launch({
     headless: true,
     executablePath: executablePath(),
+    ignoreHTTPSErrors: true,
     ignoreDefaultArgs: ["--enable-automation"],
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
   });
@@ -22,6 +23,7 @@ const bot = async () => {
     delete navigator.__proto__.webdriver;
   });
   await page.goto("https://bot.incolumitas.com/");
+  await page.setViewport({ width: 1680, height: 857 });
   await page.waitForTimeout(5000);
   // await page.screenshot({ path: "testresult3.png", fullPage: true });
   await browser.close();
