@@ -273,13 +273,40 @@ class MaerskBot {
       // Clicar no elemento
       // `td[@title="${formated_date}"]`
       try {
+        let date_arr = data_formatada.split(" ");
+        let ano_cal = date_arr[2];
+        let mes_cal = date_arr[1];
+
+        // Selecionando ANO
+        await this.page.waitForSelector(".mx-current-year");
+
+        const ano_el = (
+          await this.page.$x(`//*[contains(@class, "mx-current-year")]`)
+        )[0];
+
+        await ano_el.click();
+
+        // Selecionando MES
+        await this.page.waitForXPath(
+          `//*[contains(text(), "${mes_cal}") and contains(@class, "cell")]`,
+          { visible: true }
+        );
+
+        const mes_el = (
+          await this.page.$x(
+            `//*[contains(text(), "${mes_cal}") and contains(@class, "cell")]`
+          )
+        )[0];
+
+        await mes_el.click();
+
         await this.page.waitForXPath(
           `//*[contains(@title, "${data_formatada}")]`
         );
       } catch (e) {
         await this.page.close();
         return {
-          erro: "Data indisponível",
+          erro: `Data indisponível: ${e.toString()}`,
         };
       }
 
