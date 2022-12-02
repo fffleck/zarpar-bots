@@ -137,10 +137,10 @@ class MaerskBot {
       // Setando senha
       await this.page.focus("#passwordInput");
       await this.page.waitForTimeout(100);
-      await this.page.type("#passwordInput", "Portero1234@", { delay: 13 });
+      await this.page.type("#passwordInput", "Drenagem2606@", { delay: 13 });
       await this.page.waitForTimeout(100);
 
-      await this.page.screenshot({ path: "prints/login.png", fullPage: true });
+      // await this.page.screenshot({ path: "prints/login.png", fullPage: true });
 
       // Clicando em entrar
       const login_btn = (await this.page.$x("//*[@id='login-form']/button"))[0];
@@ -148,17 +148,11 @@ class MaerskBot {
 
       //Verificando se o logi  foi feito
       await this.page.waitForXPath('//input[@placeholder="Enter city name"]');
-      await this.page.screenshot({
-        path: "prints/result_login.png",
-        fullPage: true,
-      });
+      // await this.page.screenshot({path: "prints/result_login.png",fullPage: true,});
       console.log("Login done!");
       return true;
     } catch (e) {
-      await this.page.screenshot({
-        path: "prints/result_fail.png",
-        fullPage: true,
-      });
+      // await this.page.screenshot({path: "prints/result_fail.png",fullPage: true,});
       console.log(`Login fail: ${e.toString()}`);
       return false;
     }
@@ -182,7 +176,6 @@ class MaerskBot {
     try {
       this.page = await this.browser.newPage("");
       await this.page.setViewport({ width: 1920, height: 1080 });
-      // await this.page.goto("https://www.google.com");
       await this.page.evaluateOnNewDocument(() => {
         delete navigator.__proto__.webdriver;
       });
@@ -219,7 +212,6 @@ class MaerskBot {
       let page_url = this.page.url();
 
       if (page_url.includes("login")) {
-        tem_login = true;
         this.fazer_login();
       }
 
@@ -250,7 +242,7 @@ class MaerskBot {
         filtros.tipo_container
       );
 
-      await this.page.screenshot({ path: "prints/busca1.png", fullPage: true });
+      // await this.page.screenshot({ path: "prints/busca1.png", fullPage: true });
 
       // Selecionar data:
       // 1 - Pegar data dos filtros
@@ -274,29 +266,47 @@ class MaerskBot {
       // `td[@title="${formated_date}"]`
       try {
         let date_arr = data_formatada.split(" ");
-        let ano_cal = date_arr[2];
-        let mes_cal = date_arr[1];
+        let ano_cal = date_arr[2].trim();
+        let mes_cal = date_arr[1].trim();
 
-        // Selecionando ANO
+        // Habilitando seleção do ano
         await this.page.waitForSelector(".mx-current-year");
 
-        const ano_el = (
+        const ano_selec = (
           await this.page.$x(`//*[contains(@class, "mx-current-year")]`)
         )[0];
+
+        await ano_selec.click();
+
+        // Selecionando ANO
+        await this.page.waitForXPath(
+          `//span[contains(text(), "${ano_cal}") and contains(@class, "cell") and not(contains(@class, "disabled"))]`,
+          { visible: true }
+        );
+
+        const ano_el = (
+          await this.page.$x(
+            `//span[contains(text(), "${ano_cal}") and contains(@class, "cell") and not(contains(@class, "disabled"))]`
+          )
+        )[0];
+
+        console.log(ano_el);
 
         await ano_el.click();
 
         // Selecionando MES
         await this.page.waitForXPath(
-          `//*[contains(text(), "${mes_cal}") and contains(@class, "cell")]`,
+          `//span[contains(text(), "${mes_cal}") and contains(@class, "cell") and not(contains(@class, "disabled"))]`,
           { visible: true }
         );
 
         const mes_el = (
           await this.page.$x(
-            `//*[contains(text(), "${mes_cal}") and contains(@class, "cell")]`
+            `//span[contains(text(), "${mes_cal}") and contains(@class, "cell") and not(contains(@class, "disabled"))]`
           )
         )[0];
+
+        console.log(mes_el);
 
         await mes_el.click();
 
@@ -310,7 +320,7 @@ class MaerskBot {
         };
       }
 
-      await this.page.screenshot({ path: "prints/busca2.png", fullPage: true });
+      // await this.page.screenshot({ path: "prints/busca2.png", fullPage: true });
 
       console.log(data_formatada);
 
@@ -319,7 +329,7 @@ class MaerskBot {
       )[0];
 
       await data_calendario.click();
-      await this.page.screenshot({ path: "prints/busca3.png", fullPage: true });
+      // await this.page.screenshot({ path: "prints/busca3.png", fullPage: true });
 
       const btn_search = (
         await this.page.$x(`//button[contains(text(), "SEARCH")]`)
@@ -328,16 +338,13 @@ class MaerskBot {
       btn_search.click();
       await this.page.waitForSelector("#coiOverlay", { hidden: true });
 
-      await this.page.screenshot({ path: "prints/busca4.png", fullPage: true });
+      // await this.page.screenshot({ path: "prints/busca4.png", fullPage: true });
 
       // get departures
       // Esperar as datas aparecerem
       await this.page.waitForXPath('//div[contains(@class, "slide-inside")]');
 
-      await this.page.screenshot({
-        path: "prints/busca4-1.png",
-        fullPage: true,
-      });
+      // await this.page.screenshot({path: "prints/busca4-1.png",fullPage: true,});
 
       // Checar se botão LOAD MORE existe
       let load_more_exists = await this.page.$x(
@@ -360,7 +367,7 @@ class MaerskBot {
       }
       //aria-hidden="true"
 
-      await this.page.screenshot({ path: "prints/busca5.png", fullPage: true });
+      // await this.page.screenshot({ path: "prints/busca5.png", fullPage: true });
 
       let datas = await this.page.$$(".vueperslide");
 
@@ -377,10 +384,7 @@ class MaerskBot {
           if (!el_inner.includes('<div class="slide-inside--disabled">')) {
             await datas_temp[el_pos].click();
 
-            await this.page.screenshot({
-              path: `busca_res${el_pos}.png`,
-              fullPage: true,
-            });
+            // await this.page.screenshot({path: `busca_res${el_pos}.png`,fullPage: true,});
 
             await this.page.waitForXPath(
               '//*[contains(@class, "rate-details-card")]//div[contains(@class, "cardContent")]/div/div'
@@ -450,17 +454,11 @@ class MaerskBot {
       // const cookies = await page.cookies();
       // await fs.writeFile("cookies.json", JSON.stringify(cookies, null, 2));
 
-      await this.page.screenshot({
-        path: "prints/result_busca.png",
-        fullPage: true,
-      });
+      // await this.page.screenshot({path: "prints/result_busca.png",fullPage: true,});
       await this.page.close();
       return results;
     } catch (e) {
-      await this.page.screenshot({
-        path: "prints/result_busca_fail.png",
-        fullPage: true,
-      });
+      // await this.page.screenshot({path: "prints/result_busca_fail.png",fullPage: true,});
       await this.page.close();
       if (results && results.length) {
         return results;
