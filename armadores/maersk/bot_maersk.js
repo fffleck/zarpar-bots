@@ -9,10 +9,14 @@ puppeteer.use(StealthPlugin());
  * raspagem de dados do site "https://www.maersk.com".
  */
 class MaerskBot {
-  constructor() {
+  constructor(page_id) {
     this.page = null;
     this.browser = null;
     this.pagina_iniciada = false;
+    this.isInUse = false;
+    this.lastTimeLogin = null;
+    this.lastLoginFails = false;
+    this.page_id = page_id;
   }
 
   /**
@@ -23,94 +27,101 @@ class MaerskBot {
   async init_page() {
     // Se a página já foi iniciada dispara um erro.
     if (this.pagina_iniciada) {
-      throw "A página já foi iniciada";
+      return true;
     }
 
-    // Criando o browser
-    this.browser = await puppeteer.launch({
-      headless: false,
-      executablePath: executablePath(),
-      ignoreHTTPSErrors: true,
-      ignoreDefaultArgs: ["--enable-automation"],
-      defaultViewport: null,
-      args: [
-        "--start-maximized",
-        "--user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36",
-        "--no-sandbox",
-        "--disable-setuid-sandbox",
-        "--disable-web-security",
-        "--disable-features=IsolateOrigins",
-        "--disable-site-isolation-trials",
-        "--disable-features=BlockInsecurePrivateNetworkRequests",
-      ],
-    });
+    this.isInUse = true;
 
-    // Criando a page
-    this.page = await this.browser.newPage("");
-
-    await this.page.setViewport({ width: 1920, height: 1080 });
-
-    // Setando um User Agent fake
-    await this.page.evaluateOnNewDocument(() => {
-      delete navigator.__proto__.webdriver;
-    });
-
-    await this.page.setExtraHTTPHeaders({
-      "Accept-Language": "en-US,en;q=0.9",
-    });
-
-    await this.page.setUserAgent(
-      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36"
-    );
-
-    // Verificando se existem cookies salvos, se sim, usa eles
-    let cookies_file_found = false;
     try {
-      const cookiesString = await fs.readFile("cookies.json");
-      const reuse_cookies = JSON.parse(cookiesString);
-      await this.page.setCookie(...reuse_cookies);
-      console.log("Cookies file found.");
-      cookies_file_found = true;
+      // Criando o browser
+      this.browser = await puppeteer.launch({
+        headless: false,
+        executablePath: executablePath(),
+        ignoreHTTPSErrors: true,
+        ignoreDefaultArgs: ["--enable-automation"],
+        defaultViewport: null,
+        args: [
+          "--start-maximized",
+          "--user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36",
+          "--no-sandbox",
+          "--disable-setuid-sandbox",
+          "--disable-web-security",
+          "--disable-features=IsolateOrigins",
+          "--disable-site-isolation-trials",
+          "--disable-features=BlockInsecurePrivateNetworkRequests",
+        ],
+      });
+
+      // Criando a page
+      this.page = await this.browser.newPage("");
+
+      await this.page.setViewport({ width: 1920, height: 1080 });
+
+      // Setando um User Agent fake
+      await this.page.evaluateOnNewDocument(() => {
+        delete navigator.__proto__.webdriver;
+      });
+
+      await this.page.setExtraHTTPHeaders({
+        "Accept-Language": "en-US,en;q=0.9",
+      });
+
+      await this.page.setUserAgent(
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36"
+      );
+
+      // Verificando se existem cookies salvos, se sim, usa eles
+      let cookies_file_found = false;
+      try {
+        const cookiesString = await fs.readFile("cookies.json");
+        const reuse_cookies = JSON.parse(cookiesString);
+        await this.page.setCookie(...reuse_cookies);
+        console.log("Cookies file found.");
+        cookies_file_found = true;
+      } catch (e) {
+        console.log(e);
+        console.log("Cookies file not found.");
+      }
+
+      // Abrindo a pagina
+      await this.page.goto("https://www.maersk.com/instantPrice/", {
+        waitUntil: "networkidle2",
+      });
+
+      // Verificando se é necessário fazer login
+      let tem_login = false;
+      let page_url = this.page.url();
+
+      if (page_url.includes("login")) {
+        tem_login = true;
+      }
+
+      if (!cookies_file_found || tem_login) {
+        // Clicando no botao para aceitar todos os cookies
+        if (!cookies_file_found) {
+          const accept_cookies_btn = (
+            await this.page.$x(
+              "//*[@id='coiPage-1']/div/button[@onclick='CookieInformation.submitAllCategories();']"
+            )
+          )[0];
+          await accept_cookies_btn.click();
+        }
+
+        // Faz o login
+        let ok = this.fazer_login();
+
+        // Se o login foi bem-sucedido, retorna true, se não, retorna false.
+        if (ok) {
+          this.pagina_iniciada = true;
+          return true;
+        } else {
+          this.pagina_iniciada = false;
+          return false;
+        }
+      }
     } catch (e) {
-      console.log(e);
-      console.log("Cookies file not found.");
-    }
-
-    // Abrindo a pagina
-    await this.page.goto("https://www.maersk.com/instantPrice/", {
-      waitUntil: "networkidle2",
-    });
-
-    // Verificando se é necessário fazer login
-    let tem_login = false;
-    let page_url = this.page.url();
-
-    if (page_url.includes("login")) {
-      tem_login = true;
-    }
-
-    if (!cookies_file_found || tem_login) {
-      // Clicando no botao para aceitar todos os cookies
-      if (!cookies_file_found) {
-        const accept_cookies_btn = (
-          await this.page.$x(
-            "//*[@id='coiPage-1']/div/button[@onclick='CookieInformation.submitAllCategories();']"
-          )
-        )[0];
-        await accept_cookies_btn.click();
-      }
-
-      // Faz o login
-      let ok = this.fazer_login();
-
-      // Se o login foi bem-sucedido, retorna true, se não, retorna false.
-      if (ok) {
-        this.pagina_iniciada = true;
-        return true;
-      } else {
-        this.pagina_iniciada = false;
-        return false;
-      }
+      console.log(`Erro na inicialização do browser: ${e}`);
+      return false;
     }
   }
 
@@ -119,6 +130,7 @@ class MaerskBot {
    * @returns **boolean** — Retorna **true** se o login foi bem-sucedido. Se houve algum erro no login, retorna **false**.
    */
   async fazer_login() {
+    this.isInUse = true;
     try {
       // Esperar os campos de login serem visíveis
       await this.page.setDefaultTimeout(20000);
@@ -150,10 +162,16 @@ class MaerskBot {
       await this.page.waitForXPath('//input[@placeholder="Enter city name"]');
       // await this.page.screenshot({path: "prints/result_login.png",fullPage: true,});
       console.log("Login done!");
+      this.lastLoginFails = false;
+      this.lastTimeLogin = new Date();
+      this.isInUse = false;
       return true;
     } catch (e) {
       // await this.page.screenshot({path: "prints/result_fail.png",fullPage: true,});
       console.log(`Login fail: ${e.toString()}`);
+      this.lastLoginFails = true;
+      this.lastTimeLogin = new Date();
+      this.isInUse = false;
       return false;
     }
   }
@@ -165,6 +183,7 @@ class MaerskBot {
    * @returns Array -- Retorna um Array de Objetos com o resultado da raspagem.
    */
   async busca_dados(filtros) {
+    this.isInUse = true;
     if (!this.pagina_iniciada) {
       return {
         erro: "Aguardando servidor iniciar...",
@@ -315,6 +334,7 @@ class MaerskBot {
         );
       } catch (e) {
         await this.page.close();
+        this.isInUse = false;
         return {
           erro: `Data indisponível: ${e.toString()}`,
         };
@@ -396,11 +416,17 @@ class MaerskBot {
             let saida_inner = await (
               await result_details[0].getProperty("innerHTML")
             ).jsonValue();
+
             let chegada_inner = await (
               await result_details[2].getProperty("innerHTML")
             ).jsonValue();
+
             let tempo_transito_inner = await (
               await result_details[1].getProperty("innerHTML")
+            ).jsonValue();
+
+            let navio_inner = await (
+              await result_details[3].getProperty("innerHTML")
             ).jsonValue();
 
             await this.page.waitForXPath(
@@ -425,7 +451,25 @@ class MaerskBot {
               .split("</i>")[1]
               .split("TRANSIT TIME<div>\n");
 
+            let navio = navio_inner
+              .replace(/<\/div>/g, "")
+              .split("</i>")[1]
+              .split("VESSEL/VOYAGE :")[1]
+              .split("<span>")[0]
+              .trim();
+
+            navio =
+              navio +
+              navio_inner
+                .replace(/<\/div>/g, "")
+                .split("</i>")[1]
+                .split("VESSEL/VOYAGE :")[1]
+                .split("<span>")[1]
+                .replace("</span>", "")
+                .trim();
+
             results.push({
+              nome_navio: navio,
               porto_embarque: saida_array[1].split(">").at(-1),
               data_saida: new Date(saida_array[2]),
               tempo_de_transito: tempo_transito_array[1].trim(),
@@ -443,6 +487,7 @@ class MaerskBot {
         }
       } else {
         await this.page.close();
+        this.isInUse = false;
         return {
           error_msg: `Sem resultados.`,
         };
@@ -456,10 +501,12 @@ class MaerskBot {
 
       // await this.page.screenshot({path: "prints/result_busca.png",fullPage: true,});
       await this.page.close();
+      this.isInUse = false;
       return results;
     } catch (e) {
       // await this.page.screenshot({path: "prints/result_busca_fail.png",fullPage: true,});
       await this.page.close();
+      this.isInUse = false;
       if (results && results.length) {
         return results;
       } else {
@@ -467,6 +514,14 @@ class MaerskBot {
           erro: e.toString(),
         };
       }
+    }
+  }
+
+  async close_browser() {
+    try {
+      await this.browser.close();
+    } catch (e) {
+      console.log("Browser ja estava fechado.");
     }
   }
 
