@@ -520,8 +520,11 @@ class MaerskBot {
   async close_browser() {
     try {
       await this.browser.close();
+      if (browser && browser.process() != null)
+        browser.process().kill("SIGINT");
+      console.log("Browser fechado.");
     } catch (e) {
-      console.log("Browser ja estava fechado.");
+      console.log("Browser já estava fechado.");
     }
   }
 
