@@ -1,7 +1,11 @@
 const express = require("express");
 const nunjucks = require("nunjucks");
-const Maersk = require("./armadores/maersk/maersk");
+// const Maersk = require("./armadores/maersk/maersk");
+const zimbot = require("./armadores/zim/zimBot");
+const connectDatabase = require("./db");
 const app = express();
+connectDatabase();
+
 app.use(express.static("public"));
 
 nunjucks.configure("views", {
@@ -10,20 +14,43 @@ nunjucks.configure("views", {
 });
 
 // Iniciando armadores
-const maersk = new Maersk(1, 5);
+// const maersk = new Maersk(1, 5);
 
 app.get("/", async (req, res) => {
   res.render("index.html");
 });
 
-app.get("/maersk", async (req, res) => {
-  console.log("Nova consulta MAERSK:");
-  let response = await maersk.getData(req.query);
-  res.header("Access-Control-Allow-Origin", "*");
+app.get("/zim", async (req, res) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "*");
+  res.setHeader("Access-Control-Allow-Headers", "*");
+
+  const {
+    data_saida,
+    porto_embarque,
+    porto_descarga,
+    mercadoria,
+    tipo_container,
+  } = req.query;
+
+  const response = await zimbot(
+    data_saida,
+    porto_embarque,
+    porto_descarga,
+    tipo_container
+  );
   res.send(response);
 });
 
+// app.get("/maersk", async (req, res) => {
+//   console.log("Nova consulta MAERSK:");
+//   let response = await maersk.getData(req.query);
+//   res.header("Access-Control-Allow-Origin", "*");
+//   res.send(response);
+// });
+
 const PORT = process.env.PORT || 3000;
+// const PORT = process.env.PORT || 3334; //TESTES
 
 app.listen(PORT, (err) => {
   if (err) throw err;
