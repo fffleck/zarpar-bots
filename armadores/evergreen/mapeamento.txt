@@ -1,0 +1,52 @@
+Passo 1:
+-> Abrir o link e realizar o login
+
+Passo 2: 
+-> Montar a seguinte url: 
+* Containers ( 0 ou 1 )
+20' GP
+40' GP
+40' HQ
+
+* Data
+(Avaliar o tipo da data, mas parece milissegundos, é um número inteiro, tipo esse: 1677165069) -> MULTIPLICAR DATAS POR MIL
+
+https://portal.greenxtrade.com/quotes/results/{PORT_CODE_ORIGEM}/{PORT_CODE_DESTINO}/{20' GP}/{40' GP}/{40' HQ}/{DATA}
+
+Passo 3:
+-> Procurar pela requisição:
+URL = https://portal.greenxtrade.com/graphql
+PAYLOAD:
+operationName: "quotes2"
+
+-> Pegar os dados da resposta e montar o retorno. (Olhar arquivo exemplo_resposta.js)
+
+# ESTRUTURA api
+-> ACESSO:
+- Cada item do array quotes é um navio
+quotes2 -> quotes -> []
+
+-> Pegar logo dos armadores
+1. Dentro de carrier no quote temos o scac, pegar esse nome e procurar no array de carriers
+-> CARRIER: quotes.carrier
+-> CARRIERS: carriers (array)
+
+CONSTRUÇÃO FINAL:
+{
+    shipment_id: shipment_id, ----> quote.voyage.code
+    tipo_container: tipo_container,
+    id_tipo_container: tipo_container,
+    porto_embarque: portnamedef.split(" - ")[0],
+    id_porto_embarque: origincodedef.port_code,
+    porto_descarga: destinationportnamedef.split(" - ")[0],
+    id_porto_descarga: destinationcodedef.port_code,
+    armador: "Zim", ----> quote.carrier.name
+    id_armador: "Zim", ----> quote.carrier.scac
+    navio: "",
+    data_embarque: formataData(data_saida_convertida), ----> quote.etd * 1000
+    tempo_de_transito: `${transitTime} days`, 
+    data_chegada: formataData(data_chegada), ----> quote.eta * 1000
+    frete: `$ ${frete}`, --> Por enquanto ZERO pois não tem como mapear um cenário
+    imagem_link: ----> quote.carriers[armador_atual].logoUrl
+},
+

@@ -15,7 +15,7 @@
     "mongoose": "^7.0.0",
     "node-cron": "^3.0.2",
     "nunjucks": "^3.2.3",
-    "puppeteer": "^19.7.2",
+    "puppeteer": "^19.7.3",
     "puppeteer-extra": "^3.3.4",
     "puppeteer-extra-plugin-stealth": "^2.11.1"
   },

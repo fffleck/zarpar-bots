@@ -2,6 +2,7 @@ const express = require("express");
 const nunjucks = require("nunjucks");
 // const Maersk = require("./armadores/maersk/maersk");
 const zimbot = require("./armadores/zim/zimBot");
+const EvergreenBot = require("./armadores/evergreen/evergreenBot");
 const connectDatabase = require("./db");
 const app = express();
 connectDatabase();
@@ -37,9 +38,40 @@ app.get("/zim", async (req, res) => {
     data_saida,
     porto_embarque,
     porto_descarga,
+    mercadoria,
     tipo_container
   );
   res.send(response);
+});
+
+app.get("/evergreen", async (req, res) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "*");
+  res.setHeader("Access-Control-Allow-Headers", "*");
+
+  const {
+    data_saida,
+    porto_embarque,
+    porto_descarga,
+    mercadoria,
+    tipo_container,
+  } = req.query;
+
+  const evBot = new EvergreenBot(0);
+  let ok = await evBot.init_page();
+
+  if (!ok) {
+    return [];
+  }
+  res.send(
+    await evBot.busca_dados(
+      data_saida,
+      porto_embarque,
+      porto_descarga,
+      mercadoria,
+      tipo_container
+    )
+  );
 });
 
 // app.get("/maersk", async (req, res) => {
