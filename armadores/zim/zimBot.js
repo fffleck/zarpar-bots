@@ -12,6 +12,7 @@ const zimbot = async (
   data_saida,
   porto_embarque,
   porto_descarga,
+  mercadoria,
   tipo_container
 ) => {
   try {
@@ -98,7 +99,14 @@ const zimbot = async (
       await body_content.getProperty("textContent")
     ).jsonValue();
 
-    browser.close();
+    try {
+      await browser.close();
+      if (browser && browser.process() != null)
+        browser.process().kill("SIGINT");
+      console.log("Browser fechado.");
+    } catch (e) {
+      console.log("Browser já estava fechado.");
+    }
 
     let result_json = JSON.parse(text_html);
     console.log(result_json.result.routes);
