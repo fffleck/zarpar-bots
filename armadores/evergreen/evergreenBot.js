@@ -36,7 +36,7 @@ class EvergreenBot {
       // Criando o browser
       this.browser = await puppeteer.launch({
         headless: true,
-        // executablePath: executablePath(), // TESTES
+        executablePath: executablePath(), // TESTES
         // executablePath: "/usr/bin/google-chrome",
         ignoreHTTPSErrors: true,
         ignoreDefaultArgs: ["--enable-automation"],
