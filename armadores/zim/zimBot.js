@@ -20,7 +20,6 @@ const zimbot = async (
     const browser = await puppeteer.launch({
       headless: true,
       executablePath: executablePath(),
-
       // executablePath: "/usr/bin/google-chrome",
       ignoreHTTPSErrors: true,
       ignoreDefaultArgs: ["--enable-automation"],
