@@ -5,6 +5,8 @@ const zimbot = require("./armadores/zim/zimBot");
 const EvergreenBot = require("./armadores/evergreen/evergreenBot");
 const connectDatabase = require("./db");
 const app = express();
+const pLimit = require("p-limit");
+const limit = pLimit(2); // Limita a 2 processos em execução simultânea
 connectDatabase();
 
 app.use(express.static("public"));
@@ -34,13 +36,16 @@ app.get("/zim", async (req, res) => {
     tipo_container,
   } = req.query;
 
-  const response = await zimbot(
-    data_saida,
-    porto_embarque,
-    porto_descarga,
-    mercadoria,
-    tipo_container
+  const response = await limit(() =>
+    zimbot(
+      data_saida,
+      porto_embarque,
+      porto_descarga,
+      mercadoria,
+      tipo_container
+    )
   );
+
   res.send(response);
 });
 
@@ -58,18 +63,20 @@ app.get("/evergreen", async (req, res) => {
   } = req.query;
 
   const evBot = new EvergreenBot(0);
-  let ok = await evBot.init_page();
+  let ok = await limit(() => evBot.init_page());
 
   if (!ok) {
     return [];
   }
   res.send(
-    await evBot.busca_dados(
-      data_saida,
-      porto_embarque,
-      porto_descarga,
-      mercadoria,
-      tipo_container
+    await limit(() =>
+      evBot.busca_dados(
+        data_saida,
+        porto_embarque,
+        porto_descarga,
+        mercadoria,
+        tipo_container
+      )
     )
   );
 });
