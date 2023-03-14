@@ -1,12 +1,12 @@
-const puppeteer = require("puppeteer-extra");
-const fs = require("fs").promises;
-const { executablePath } = require("puppeteer");
-const StealthPlugin = require("puppeteer-extra-plugin-stealth");
+import puppeteer from "puppeteer-extra";
+import { promises as fs } from "fs";
+import { executablePath } from "puppeteer";
+import StealthPlugin from "puppeteer-extra-plugin-stealth";
 puppeteer.use(StealthPlugin());
-const ports = require("./ports");
+import ports from "./ports.js";
 
 // Models
-const Porto = require("../../model/Porto");
+import Porto from "../../model/Porto.js";
 
 class EvergreenBot {
   constructor(page_id) {
@@ -350,4 +350,4 @@ function converteStrToData2(dataStr) {
   return new Date(year, month, day);
 }
 
-module.exports = EvergreenBot;
+export default EvergreenBot;

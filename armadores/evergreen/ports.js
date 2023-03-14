@@ -4294,4 +4294,4 @@ const ports = [
   },
 ];
 
-module.exports = ports;
+export default ports;

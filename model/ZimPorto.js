@@ -1,4 +1,4 @@
-const { Schema, model } = require("mongoose");
+import { Schema, model } from "mongoose";
 
 const ZimPortoSchema = new Schema({
   port_id: {
@@ -16,4 +16,4 @@ const ZimPortoSchema = new Schema({
   },
 });
 
-module.exports = model("ZimPorto", ZimPortoSchema);
+export default model("ZimPorto", ZimPortoSchema);

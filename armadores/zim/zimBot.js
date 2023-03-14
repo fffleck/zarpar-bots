@@ -1,12 +1,12 @@
-const puppeteer = require("puppeteer-extra");
-const fs = require("fs").promises;
-const { executablePath } = require("puppeteer");
-const StealthPlugin = require("puppeteer-extra-plugin-stealth");
+import puppeteer from "puppeteer-extra";
+import { promises as fs } from "fs";
+import { executablePath } from "puppeteer";
+import StealthPlugin from "puppeteer-extra-plugin-stealth";
 puppeteer.use(StealthPlugin());
 
 // Models
-const ZimPorto = require("../../model/ZimPorto");
-const Porto = require("../../model/Porto");
+import ZimPorto from "../../model/ZimPorto.js";
+import Porto from "../../model/Porto.js";
 
 const zimbot = async (
   data_saida,
@@ -209,4 +209,4 @@ function converteStrToData2(dataStr) {
   return new Date(year, month, day);
 }
 
-module.exports = zimbot;
+export default zimbot;

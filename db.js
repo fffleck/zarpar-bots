@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const dotenv = require("dotenv");
+import mongoose from "mongoose";
+import dotenv from "dotenv";
 dotenv.config();
 
 const connectDatabase = () => {
@@ -9,4 +9,4 @@ const connectDatabase = () => {
   );
 };
 
-module.exports = connectDatabase;
+export default connectDatabase;

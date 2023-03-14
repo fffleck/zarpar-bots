@@ -1,23 +1,17 @@
-const express = require("express");
-const nunjucks = require("nunjucks");
-// const Maersk = require("./armadores/maersk/maersk");
-const zimbot = require("./armadores/zim/zimBot");
-const EvergreenBot = require("./armadores/evergreen/evergreenBot");
-const connectDatabase = require("./db");
+import express from "express";
+import zimbot from "./armadores/zim/zimBot.js";
+import EvergreenBot from "./armadores/evergreen/evergreenBot.js";
+import connectDatabase from "./db.js";
 const app = express();
-const pLimit = require("p-limit");
-const limit = pLimit(2); // Limita a 2 processos em execução simultânea
+import pLimit from "p-limit";
 connectDatabase();
 
 app.use(express.static("public"));
 
-nunjucks.configure("views", {
-  autoescape: true,
-  express: app,
-});
-
 // Iniciando armadores
 // const maersk = new Maersk(1, 5);
+
+const limit = pLimit(1); // Limita a 2 processos em execução simultânea
 
 app.get("/", async (req, res) => {
   res.render("index.html");
@@ -36,7 +30,7 @@ app.get("/zim", async (req, res) => {
     tipo_container,
   } = req.query;
 
-  const response = await limit(() =>
+  const response = await limit(async () =>
     zimbot(
       data_saida,
       porto_embarque,
@@ -63,7 +57,7 @@ app.get("/evergreen", async (req, res) => {
   } = req.query;
 
   const evBot = new EvergreenBot(0);
-  let ok = await limit(() => evBot.init_page());
+  let ok = await limit(async () => evBot.init_page());
 
   if (!ok) {
     return [];
