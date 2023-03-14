@@ -37,20 +37,21 @@ class EvergreenBot {
       this.browser = await puppeteer.launch({
         headless: true,
         executablePath: executablePath(), // TESTES
+        args: ["--no-sandbox", "--disable-setuid-sandbox"],
         // executablePath: "/usr/bin/google-chrome",
-        ignoreHTTPSErrors: true,
-        ignoreDefaultArgs: ["--enable-automation"],
-        defaultViewport: null,
-        args: [
-          "--start-maximized",
-          "--user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36",
-          "--no-sandbox",
-          "--disable-setuid-sandbox",
-          "--disable-web-security",
-          "--disable-features=IsolateOrigins",
-          "--disable-site-isolation-trials",
-          "--disable-features=BlockInsecurePrivateNetworkRequests",
-        ],
+        // ignoreHTTPSErrors: true,
+        // ignoreDefaultArgs: ["--enable-automation"],
+        // defaultViewport: null,
+        // args: [
+        //   "--start-maximized",
+        //   "--user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36",
+        //   "--no-sandbox",
+        //   "--disable-setuid-sandbox",
+        //   "--disable-web-security",
+        //   "--disable-features=IsolateOrigins",
+        //   "--disable-site-isolation-trials",
+        //   "--disable-features=BlockInsecurePrivateNetworkRequests",
+        // ],
       });
 
       // Criando a page
