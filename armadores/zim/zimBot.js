@@ -131,11 +131,16 @@ const zimbot = async (
     } else {
       throw "Tipo de container inválido.";
     }
-    let rate_total;
+    let new_bunker_factor;
+    let base_freight;
     let shipment_id;
     routes.forEach((route) => {
-      rate_total = route.rates.find((rate) => {
-        return rate.chargeDescription == "Total";
+      new_bunker_factor = route.rates.find((rate) => {
+        return rate.chargeDescription.includes("NEW BUNKER FACTOR");
+      });
+
+      base_freight = route.rates.find((rate) => {
+        return rate.chargeDescription.includes("BASE FREIGHT, FUEL SURCHARGE");
       });
 
       shipment_id = route.referenceCode;
@@ -144,7 +149,8 @@ const zimbot = async (
       transitTime += parseInt(route.transitTimeDays);
 
       // Container Fee
-      frete += parseFloat(rate_total[containerType][0]);
+      frete += parseFloat(new_bunker_factor[containerType][0]);
+      frete += parseFloat(base_freight[containerType][0]);
     });
 
     let data_saida_convertida = converteStrToData2(data_saida);
