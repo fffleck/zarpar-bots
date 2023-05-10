@@ -256,11 +256,11 @@ class EvergreenBot {
         }
       );
 
-      let tempo_max_espera = 60; //segundos
+      let tempo_max_espera = 10; //segundos
       let contador = 0;
 
       while (!response_graphql && contador < tempo_max_espera) {
-        await this.delay(1000);
+        await this.delay(500);
         contador++;
         console.log("Response not found");
       }
