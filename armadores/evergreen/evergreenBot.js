@@ -249,6 +249,8 @@ class EvergreenBot {
       });
 
       // Monta URL
+
+      // ERRO NA API
       await this.page.goto(
         `https://portal.greenxtrade.com/quotes/results/${origincodedef}/${destinationcodedef}/${c_20gp}/${c_40gp}/${c_40hq}/${data_num}`,
         {
