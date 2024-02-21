@@ -78,10 +78,10 @@ class EvergreenBot {
         const cookiesString = await fs.readFile("./cookies.json");
         const reuse_cookies = JSON.parse(cookiesString);
         await this.page.setCookie(...reuse_cookies);
-        console.log("Cookies file found.");
+        // console.log("Cookies file found.");
         cookies_file_found = true;
       } catch (e) {
-        console.log(e);
+        // console.log(e);
         console.log("Cookies file not found.");
       }
 
