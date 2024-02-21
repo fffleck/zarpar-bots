@@ -17,7 +17,6 @@ const zimbot = async (
 ) => {
   try {
     // Criando o browser
-    console.log("Chegou aqui");
     const browser = await puppeteer.launch({
       headless: true,
       executablePath: executablePath(),
