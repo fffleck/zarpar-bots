@@ -35,7 +35,7 @@ class EvergreenBot {
     try {
       // Criando o browser
       this.browser = await puppeteer.launch({
-        headless: true,
+        headless: new,
         executablePath: executablePath(), // TESTES
         args: ["--no-sandbox", "--disable-setuid-sandbox"],
         // executablePath: "/usr/bin/google-chrome",

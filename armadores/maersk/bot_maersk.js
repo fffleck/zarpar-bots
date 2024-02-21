@@ -35,7 +35,7 @@ class MaerskBot {
     try {
       // Criando o browser
       this.browser = await puppeteer.launch({
-        headless: false,
+        headless: new,
         executablePath: executablePath(),
         ignoreHTTPSErrors: true,
         ignoreDefaultArgs: ["--enable-automation"],
