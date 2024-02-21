@@ -18,7 +18,7 @@ const zimbot = async (
   try {
     // Criando o browser
     const browser = await puppeteer.launch({
-      headless: new,
+      headless: 'new',
       executablePath: executablePath(),
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
       // executablePath: "/usr/bin/google-chrome",
