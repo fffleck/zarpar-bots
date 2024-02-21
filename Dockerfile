@@ -58,8 +58,6 @@ WORKDIR /app
 # Copy package.json into app folder
 COPY package.json /app
 
-RUN npm install -g npm@10.4.0 
-
 # Install dependencies
 RUN npm install 
 
