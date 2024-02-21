@@ -209,10 +209,15 @@ class EvergreenBot {
 
     try {
       // Get porto embarque
-      const porto_embarque_def = await Porto.find({ port_id: porto_embarque });
+      const porto_embarque_def = await Porto.find({ port_code: porto_embarque });
+
+      console.log("PORTO EMBARQUE", porto_embarque_def, porto_embarque);
+      
 
       // Get porto descarga
-      const porto_descarga_def = await Porto.find({ port_id: porto_descarga });
+      const porto_descarga_def = await Porto.find({ port_code: porto_descarga });
+
+      console.log("PORTO DESCARGA", porto_descarga_def, porto_descarga);
 
       let portnamedef = porto_embarque_def[0].port_name;
       let destinationportnamedef = porto_descarga_def[0].port_name;
@@ -242,6 +247,8 @@ class EvergreenBot {
       this.page.on("response", async (response) => {
         if (response.url().includes("/graphql")) {
           let res = await response.json();
+
+          console.log("RESPOSTA ", res.data);
           if (res.data.quotes2) {
             response_graphql = res.data.quotes2;
           }
@@ -260,6 +267,9 @@ class EvergreenBot {
 
       let tempo_max_espera = 10; //segundos
       let contador = 0;
+
+      console.log("GARPHQL ", response_graphql);
+
 
       while (!response_graphql && contador < tempo_max_espera) {
         await this.delay(500);

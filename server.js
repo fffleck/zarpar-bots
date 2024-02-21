@@ -14,7 +14,7 @@ app.use(express.static("public"));
 const limit = pLimit(1); // Limita a 2 processos em execução simultânea
 
 app.get("/", async (req, res) => {
-  res.render("index.html");
+  res.render("./views/index.html");
 });
 
 app.get("/zim", async (req, res) => {
@@ -82,8 +82,8 @@ app.get("/evergreen", async (req, res) => {
 //   res.send(response);
 // });
 
-const PORT = process.env.PORT || 3000;
-// const PORT = process.env.PORT || 3334; //TESTES
+// const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000; //TESTES
 
 app.listen(PORT, (err) => {
   if (err) throw err;
