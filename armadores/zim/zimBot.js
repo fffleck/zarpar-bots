@@ -17,7 +17,6 @@ const zimbot = async (
 ) => {
   try {
     // Criando o browser
-    console.log("Chegou aqui");
     const browser = await puppeteer.launch({
       headless: true,
       executablePath: executablePath(),
@@ -111,7 +110,6 @@ const zimbot = async (
     }
 
     let result_json = JSON.parse(text_html);
-    console.log(result_json.result.routes);
 
     let frete = 0.0;
     let transitTime = 0;
@@ -159,7 +157,7 @@ const zimbot = async (
     let data_chegada = new Date(data_saida_convertida);
     data_chegada.setDate(data_chegada.getDate() + transitTime);
 
-    console.log("Ok");
+    // console.log("Ok");
 
     return [
       {
@@ -176,7 +174,7 @@ const zimbot = async (
         data_embarque: formataData(data_saida_convertida),
         tempo_de_transito: `${transitTime} days`,
         data_chegada: formataData(data_chegada),
-        frete: `$ ${frete}`,
+        frete: frete,
         imagem_link: "https://www.zim.com/static/images/logo_zim_social.png",
       },
     ];
