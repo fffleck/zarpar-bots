@@ -31,6 +31,8 @@ quotes2 -> quotes -> []
 -> CARRIER: quotes.carrier
 -> CARRIERS: carriers (array)
 
+
+
 CONSTRUÇÃO FINAL:
 {
     shipment_id: shipment_id, ----> quote.voyage.code
