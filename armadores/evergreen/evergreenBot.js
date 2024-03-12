@@ -248,7 +248,6 @@ class EvergreenBot {
         if (response.url().includes("/graphql")) {
           let res = await response.json();
 
-          console.log("RESPOSTA ", res.data);
           if (res.data.quotes2) {
             response_graphql = res.data.quotes2;
           }

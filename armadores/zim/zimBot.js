@@ -95,6 +95,11 @@ const zimbot = async (
     );
 
     console.log(await page.url());
+
+
+    console.log("PAGE ZIM ", page);
+
+    
     const body_content = await page.$("body");
     const text_html = await (
       await body_content.getProperty("textContent")
