@@ -209,15 +209,11 @@ class EvergreenBot {
 
     try {
       // Get porto embarque
-      const porto_embarque_def = await Porto.find({ port_code: porto_embarque });
-
-      console.log("PORTO EMBARQUE", porto_embarque_def, porto_embarque);
-      
-
+      const porto_embarque_split = porto_embarque.split("_")[0];
+      const porto_embarque_def = await Porto.find({ port_code: porto_embarque_split });
       // Get porto descarga
-      const porto_descarga_def = await Porto.find({ port_code: porto_descarga });
-
-      console.log("PORTO DESCARGA", porto_descarga_def, porto_descarga);
+      const porto_descarga_split = porto_descarga.split("_")[0];
+      const porto_descarga_def = await Porto.find({ port_code: porto_descarga_split });
 
       let portnamedef = porto_embarque_def[0].port_name;
       let destinationportnamedef = porto_descarga_def[0].port_name;
@@ -286,6 +282,13 @@ class EvergreenBot {
       const carriers = response_graphql.carriers;
 
       response_graphql.quotes.forEach((quote) => {
+        let priceinUSD = 0;
+
+        if (quote.originPrepaidChargeItems.length > 0) {
+          quote.originPrepaidChargeItems.forEach((price) => {
+            priceinUSD += parseInt(price.priceInUsd)
+          })
+        }
         let carrier = carriers.find((carrier) => {
           return carrier.scac === quote.carrier.scac;
         });
@@ -305,7 +308,7 @@ class EvergreenBot {
           tempo_de_transito: `${quote.transitTime.end} days`,
           data_chegada: formataData(new Date(quote.eta * 1000)),
           //frete: `$ ${0}`,
-          frete: `No Space Available`,
+          frete: priceinUSD>0 ? priceinUSD : `No space available`,
           // imagem_link: carrier.logoUrl,
           imagem_link:
             "https://cdn.greenxtrade.com/dist/gxportal/img/company-logo-evergreen.svg",
