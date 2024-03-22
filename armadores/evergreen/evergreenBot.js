@@ -36,7 +36,7 @@ class EvergreenBot {
       // Criando o browser
       this.browser = await puppeteer.launch({
         headless: true,
-        executablePath: executablePath(), // TESTES
+        executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', // TESTES
         args: ["--no-sandbox", "--disable-setuid-sandbox"],
         // executablePath: "/usr/bin/google-chrome",
         // ignoreHTTPSErrors: true,
@@ -308,7 +308,7 @@ class EvergreenBot {
           tempo_de_transito: `${quote.transitTime.end} days`,
           data_chegada: formataData(new Date(quote.eta * 1000)),
           //frete: `$ ${0}`,
-          frete: priceinUSD>0 ? priceinUSD : `No space available`,
+          frete: priceinUSD>300 ? priceinUSD : `No space available`,
           // imagem_link: carrier.logoUrl,
           imagem_link:
             "https://cdn.greenxtrade.com/dist/gxportal/img/company-logo-evergreen.svg",
