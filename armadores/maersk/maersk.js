@@ -1,6 +1,5 @@
-const MaerskBot = require("./bot_maersk");
-const CronJob = require("node-cron");
-
+import MaerskBot from "./bot_maersk.cjs"
+import CronJob from 'node-cron'
 /**
  * Disponibiliza as informações do armador Maersk
  */
@@ -153,6 +152,7 @@ class Maersk {
       });
 
       if (wasPageFound) {
+        console.log("MAERSK EVOLUINDO");
         response = await pageFound.busca_dados(request);
         this.lastLoginFails = pageFound.lastLoginFails;
         this.lastTimeLogin = pageFound.lastTimeLogin;
@@ -166,4 +166,4 @@ class Maersk {
   }
 }
 
-module.exports = Maersk;
+export default Maersk;

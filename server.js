@@ -4,12 +4,15 @@ import EvergreenBot from "./armadores/evergreen/evergreenBot.js";
 import connectDatabase from "./db.js";
 const app = express();
 import pLimit from "p-limit";
+import Maersk from "./armadores/maersk/maersk.js";
+import MaerskBot from "./armadores/maersk/bot_maersk.cjs";
 connectDatabase();
 
 app.use(express.static("public"));
 
 // Iniciando armadores
-// const maersk = new Maersk(1, 5);
+const maersk = new Maersk(1, 5);
+const maerskBot = new MaerskBot(1);
 
 const limit = pLimit(1); // Limita a 2 processos em execução simultânea
 
@@ -56,7 +59,7 @@ app.get("/evergreen", async (req, res) => {
     tipo_container,
   } = req.query;
 
-  const evBot = new EvergreenBot(0);
+  const evBot = new EvergreenBot(1);
   let ok = await limit(async () => evBot.init_page());
 
   if (!ok) {
@@ -75,15 +78,15 @@ app.get("/evergreen", async (req, res) => {
   );
 });
 
-// app.get("/maersk", async (req, res) => {
-//   console.log("Nova consulta MAERSK:");
-//   let response = await maersk.getData(req.query);
-//   res.header("Access-Control-Allow-Origin", "*");
-//   res.send(response);
-// });
+app.get("/maersk", async (req, res) => {
+  console.log("Nova consulta MAERSK:");
+  let response = await maerskBot.busca_dados(req.query);
+  res.header("Access-Control-Allow-Origin", "*");
+  res.send(response);
+});
 
 // const PORT = process.env.PORT || 3000;
-const PORT = process.env.PORT || 5000; //TESTES
+const PORT = process.env.PORT || 5001; //TESTES
 
 app.listen(PORT, (err) => {
   if (err) throw err;
