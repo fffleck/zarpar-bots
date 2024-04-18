@@ -284,12 +284,29 @@ class EvergreenBot {
 
       response_graphql.quotes.forEach((quote) => {
         let priceinUSD = 0;
+        let priceBaseFreigth = 0;
+        let priceBunker = 0;
+        let priceIsps = 0;
+
+        
 
         if (quote.originPrepaidChargeItems.length > 0) {
           quote.originPrepaidChargeItems.forEach((price) => {
             priceinUSD += parseInt(price.priceInUsd)
           })
         }
+
+
+        if (tipo_container == "ST20") {
+          priceBunker = 178;
+          priceIsps = 19;
+          priceBaseFreigth = (priceinUSD > 300) ? (priceinUSD - priceBunker - priceIsps) : 'No space available';
+        } else {
+          priceBunker = 356;
+          priceIsps = 19;
+          priceBaseFreigth = (priceinUSD > 300) ? (priceinUSD - priceBunker - priceIsps) : 'No space available';
+        }
+
         let carrier = carriers.find((carrier) => {
           return carrier.scac === quote.carrier.scac;
         });
@@ -308,9 +325,9 @@ class EvergreenBot {
           data_embarque: formataData(new Date(quote.etd * 1000)),
           tempo_de_transito: `${quote.transitTime.end} days`,
           data_chegada: formataData(new Date(quote.eta * 1000)),
-          //frete: `$ ${0}`,
-          frete: priceinUSD>300 ? priceinUSD : `No space available`,
-          // imagem_link: carrier.logoUrl,
+          base_freight: parseFloat(priceBaseFreigth),
+          bunker: parseFloat(priceBunker),
+          isps: parseFloat(priceIsps),
           imagem_link:
             "https://cdn.greenxtrade.com/dist/gxportal/img/company-logo-evergreen.svg",
         });

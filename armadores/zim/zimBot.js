@@ -94,12 +94,6 @@ const zimbot = async (
         waitUntil: "networkidle2",
       }
     );
-
-    console.log(await page.url());
-
-
-    console.log("PAGE ZIM ", page);
-
     
     const body_content = await page.$("body");
     const text_html = await (
@@ -117,7 +111,7 @@ const zimbot = async (
 
     let result_json = JSON.parse(text_html);
 
-    let frete = 0.0;
+    let frete = [];
     let transitTime = 0;
     let containerType = "";
     let routes;
@@ -138,6 +132,7 @@ const zimbot = async (
     }
     let new_bunker_factor;
     let base_freight;
+    let isps;
     let shipment_id;
     routes.forEach((route) => {
       new_bunker_factor = route.rates.find((rate) => {
@@ -148,22 +143,20 @@ const zimbot = async (
         return rate.chargeDescription.includes("BASE FREIGHT, FUEL SURCHARGE");
       });
 
+      isps = route.rates.find((isps) => {
+        return isps.chargeDescription.includes("ORIGIN PORT/TERMINAL SECURITY CHARGE");
+      })
+
       shipment_id = route.referenceCode;
 
       // Transit Time
       transitTime += parseInt(route.transitTimeDays);
-
-      // Container Fee
-      frete += parseFloat(new_bunker_factor[containerType][0]);
-      frete += parseFloat(base_freight[containerType][0]);
     });
 
     let data_saida_convertida = converteStrToData2(data_saida);
 
     let data_chegada = new Date(data_saida_convertida);
     data_chegada.setDate(data_chegada.getDate() + transitTime);
-
-    console.log("Ok");
 
     return [
       {
@@ -180,7 +173,9 @@ const zimbot = async (
         data_embarque: formataData(data_saida_convertida),
         tempo_de_transito: `${transitTime} days`,
         data_chegada: formataData(data_chegada),
-        frete: `${frete}`,
+        base_freight: parseFloat(base_freight[containerType][0]),
+        bunker: parseFloat(new_bunker_factor[containerType][0]),
+        isps: parseFloat(isps[containerType][0]),
         imagem_link: "https://www.zim.com/static/images/logo_zim_social.png",
       },
     ];
