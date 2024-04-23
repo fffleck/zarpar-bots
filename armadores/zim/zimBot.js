@@ -118,7 +118,7 @@ const zimbot = async (
     try {
       routes = result_json.result.routes;
     } catch (e) {
-      throw "Sem resultados.";
+      throw "Sem resultados da busca.";
     }
 
     if (tipo_container == "ST20") {

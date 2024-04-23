@@ -292,10 +292,10 @@ class EvergreenBot {
 
         if (quote.originPrepaidChargeItems.length > 0) {
           quote.originPrepaidChargeItems.forEach((price) => {
+            console.log("PRICE ", price);
             priceinUSD += parseInt(price.priceInUsd)
           })
         }
-
 
         if (tipo_container == "ST20") {
           priceBunker = 178;
@@ -325,7 +325,7 @@ class EvergreenBot {
           data_embarque: formataData(new Date(quote.etd * 1000)),
           tempo_de_transito: `${quote.transitTime.end} days`,
           data_chegada: formataData(new Date(quote.eta * 1000)),
-          base_freight: parseFloat(priceBaseFreigth),
+          base_freight: priceBaseFreigth,
           bunker: parseFloat(priceBunker),
           isps: parseFloat(priceIsps),
           imagem_link:
