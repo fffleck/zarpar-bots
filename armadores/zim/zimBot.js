@@ -87,6 +87,7 @@ const zimbot = async (
       "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36"
     );
 
+
     // Abrindo a pagina
     await page.goto(
       `https://www.zim.com/api/v2/tariffCalculator/GetResult?portname=${portname}&destinationportname=${destinationportname}&shipmentdate=${shipmentdate}&origincode=${origincode}&destinationcode=${destinationcode}`,
@@ -140,7 +141,7 @@ const zimbot = async (
       });
 
       base_freight = route.rates.find((rate) => {
-        return rate.chargeDescription.includes("BASE FREIGHT, FUEL SURCHARGE");
+        return rate.chargeDescription.includes("HANDLING");
       });
 
       isps = route.rates.find((isps) => {
