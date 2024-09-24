@@ -36,7 +36,8 @@ class MaerskBot {
       // Criando o browser
       this.browser = await puppeteer.launch({
         headless: true,
-        executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+        // executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+        executablePath: executablePath(),
         ignoreHTTPSErrors: true,
         ignoreDefaultArgs: ["--enable-automation"],
         defaultViewport: null,
